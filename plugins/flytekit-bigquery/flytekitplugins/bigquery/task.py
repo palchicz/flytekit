@@ -65,13 +65,12 @@ class BigQueryTask(SQLTask[BigQueryConfig]):
         self._output_schema_type = output_schema_type
 
     def get_custom(self, settings: SerializationSettings) -> Dict[str, Any]:
-        config: dict = self.task_config.QueryJobConfig.to_api_repr()["query"]
-        config.update(
-            {
+        config = {
                 "Location": self.task_config.Location,
                 "ProjectID": self.task_config.ProjectID,
             }
-        )
+        if self.task_config.QueryJobConfig is not None:
+            config.update(self.task_config.QueryJobConfig.to_api_repr()["query"])
         s = Struct()
         s.update(config)
         return s
